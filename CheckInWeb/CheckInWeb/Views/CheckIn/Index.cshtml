@@ -1,0 +1,46 @@
+﻿@model CheckInWeb.Models.MyCheckInViewModel
+@{
+    ViewBag.Title = "My Check Ins";
+}
+
+<div id="check-in-page">
+    <h2>My Latest Check Ins</h2>
+
+    <ul v-cloak v-for="checkin in getPage()">
+        <li>
+            <strong>{{checkin.Location}}</strong> -
+            <small>{{moment(checkin.Time).format('LLLL')}}</small>
+        </li>
+    </ul>
+
+    <h3 v-cloak v-if="checkins.length == 0">
+        You have not checked in at any locations yet.
+    </h3>
+</div>
+<div>
+    @* Add pagination here*@
+    &lt;&lt;Newer&nbsp;&nbsp;&nbsp;Older&gt;&gt;
+    <paginate page-count="10"
+              click-handler="app"
+              prev-text="'Older'"
+              next-text="'Newer'"
+              container-class="'className'">
+    </paginate>
+    
+</div>
+<script src="~/Scripts/moment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script type="text/javascript">
+    var app = new Vue({
+        el: '#check-in-page',
+        data: {
+            pageSize: 10,
+            checkins: @Html.Raw(Json.Encode(Model.CheckIns))
+        },
+        methods: {
+            getPage: function () {
+                return this.checkins.slice(0, this.pageSize);
+            }
+        }
+    });
+</script>

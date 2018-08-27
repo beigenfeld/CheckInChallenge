@@ -1,0 +1,33 @@
+﻿@using CheckInWeb.Data.Entities
+
+@{
+    ViewBag.Title = "My Achievements";
+}
+
+<h2>My Achievements</h2>
+
+@if (ViewBag.Achievements.Count > 0)
+{
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Time Awarded</th>
+        </tr>
+        @foreach (var achievement in ViewBag.Achievements)
+        {
+            <tr>
+                <td>@Enum.GetName(typeof(AchievementType), achievement.Type)</td>
+                <td>@achievement.TimeAwarded</td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <h3>
+        You haven't unlocked any achievements yet.
+    </h3>
+    
+}
+@ViewBag <br/>
+@ViewBag.Achievements
