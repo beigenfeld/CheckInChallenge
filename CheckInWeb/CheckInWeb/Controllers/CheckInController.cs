@@ -71,6 +71,7 @@ namespace CheckInWeb.Controllers
             repository.Insert(checkIn);
 
             // check to see if this user meets any achievements
+            //These attributes are properties of a Customer, and should be on the Customer Model
             var allCheckins = repository.Query<CheckIn>().Where(c => c.User.Id == user.Id);
             var allAchievements = repository.Query<Achievement>();
             var allLocationIds = repository.Query<Location>().Select(l => l.Id);
