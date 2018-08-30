@@ -3,6 +3,7 @@ using CheckInWeb.Data.Repositories;
 using CheckInWeb.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -17,11 +18,12 @@ namespace CheckInWeb.Controllers
         {
             return View();
         }
-        
-        public ActionResult GetUsersCheckins()
+        //Convert these Actions into a Helper Class
+        public ActionResult GetUserWithCheckins()
         {
             var model = new MyCheckInViewModel();
             var username = HttpContext.User.Identity.Name;
+            var user = repository.Query<ApplicationUser>().SingleOrDefault(u => u.UserName == username);
             // check to see if this user meets any achievements
             //These attributes are properties of a Customer, and should be on the Customer Model
             var allCheckins = repository.Query<CheckIn>().Where(c => c.User.Id == user.Id);
@@ -33,6 +35,15 @@ namespace CheckInWeb.Controllers
 
         public ActionResult AwardTwoInOneDay()
         {
+            var model = new MyCheckInViewModel();
+            var username = HttpContext.User.Identity.Name;
+            var user = repository.Query<ApplicationUser>().SingleOrDefault(u => u.UserName == username);
+            // check to see if this user meets any achievements
+            //These attributes are properties of a Customer, and should be on the Customer Model
+            var allCheckins = repository.Query<CheckIn>().Where(c => c.User.Id == user.Id);
+            var allAchievements = repository.Query<Achievement>();
+            var allLocationIds = repository.Query<Location>().Select(l => l.Id);
+            //If already awarded, break;
             if (!allAchievements.Any(a => a.Type == AchievementType.TwoInOneDay) && allCheckins.Count(c => DbFunctions.TruncateTime(c.Time) == DateTime.Today) > 2)
             {
                 var twoInOneDay = new Achievement { Type = AchievementType.TwoInOneDay, User = user, TimeAwarded = DateTime.Now };
@@ -44,6 +55,14 @@ namespace CheckInWeb.Controllers
         // all locations?
         public ActionResult HasAll()
         {
+            var model = new MyCheckInViewModel();
+            var username = HttpContext.User.Identity.Name;
+            var user = repository.Query<ApplicationUser>().SingleOrDefault(u => u.UserName == username);
+            // check to see if this user meets any achievements
+            //These attributes are properties of a Customer, and should be on the Customer Model
+            var allCheckins = repository.Query<CheckIn>().Where(c => c.User.Id == user.Id);
+            var allAchievements = repository.Query<Achievement>();
+            var allLocationIds = repository.Query<Location>().Select(l => l.Id);
             var hasAll = false;
             foreach (var testLocationId in allLocationIds)
             {
@@ -58,13 +77,22 @@ namespace CheckInWeb.Controllers
             return View();
         }
 
-        public ActionResult AwardCheckInTogether()
+        public ActionResult AwardCheckInTogether(CheckIn checkIn)
         {
-            //check in together
+            var model = new MyCheckInViewModel();
+            var username = HttpContext.User.Identity.Name;
+            var user = repository.Query<ApplicationUser>().SingleOrDefault(u => u.UserName == username);
+            // check to see if this user meets any achievements
+            //These attributes are properties of a Customer, and should be on the Customer Model
+            var allCheckins = repository.Query<CheckIn>().Where(c => c.User.Id == user.Id);
+            var allAchievements = repository.Query<Achievement>();
+            var allLocationIds = repository.Query<Location>().Select(l => l.Id);
+
+
             //Query the CheckIns repository, WHERE the DateTime on all CheckIn Times is less than an hour of this checkin.
-            //If it returns any (i.e. the count of the returns >0), 
             //the users on those checkins and the current user receive the award
-            //repository.Query<CheckIn>().Where(checkInSpan.TotalHours <= 1)
+
+            var checkInTogetherArray = repository.Query<CheckIn>().Where(c => c.Time.Subtract(checkIn.Time).TotalHours <= 1);
 
             return View();
         }
